@@ -1,0 +1,4 @@
+passengerName,city1,city2,city3,isRoundTrip
+Bob Smith,fra,iad,,false
+Jane Smith,baltimore md,beijing,,true
+John Doe,dca,lax,fra,true

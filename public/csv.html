@@ -1,0 +1,119 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
+  <title>CSV Result</title>
+  <link rel="shortcut icon" href="favicon.ico">
+
+  <div id="app" class="flex flex-column"></div>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/feathers.js"></script>
+  <script src="/js/toastr.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/toastr.min.css">
+</head>
+<body>
+  <script src="/js/common.js"></script>
+  <script src="/js/csv.js"></script>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">CO2 Footprint</a>
+      </div>
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li ><a href="/">Home</a></li>
+          <li ><a href="/results.html">My results </a></li>
+          <li class="active"><a href="#" id="csvHeaderName"><span class="sr-only">(current)</span></a></li>
+          <li><a href="/faq.html">FAQ</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#" onclick="logout()">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div id="main" class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <p ><span class="lead"><span id="csvName"></span>
+        </span><br/><h4><small id="csvDate"></small></h4>
+      </p>
+      <form id="downloadBtnForm" method="get" action="" style="display:none;">
+        <button type="submit" id="downloadBtn" class="btn btn-default" aria-label="Left Align">
+          <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+          Download Results
+        </button>
+      </form>
+      <div id="errors-container">
+      </div>
+      <table class="table table-condensed">
+        <tr>
+          <th>Total passengers</th>
+          <th>Total km</th>
+          <th>Mean CO2e/Passenger</th>
+          <th>Median CO2e/Passenger</th>
+          <th>Total CO2e</th>
+        </tr>
+        <tr>
+          <td id="totalPassengers"></td>
+          <td id="totalDist"></td>
+          <td id="avgCO2"></td>
+          <td id="medianCO2">13</td>
+          <td id="totalCO2"></td>
+        </tr>
+      </table>
+      <hr>
+      <h3>Passenger breakdown</h3>
+      <p id="minDistCutoff" style="color:gray"></p>
+      <br />
+      <table id="breakdownTable" class="table table-bordered">
+        <tr class="active">
+          <th>#</th>
+          <th>Passenger name</th>
+          <th>Airports</th>
+          <th>Input cities</th>
+          <th>Round trip?</th>
+          <th>Rad. Forcing?</th>
+          <th>Total km</th>
+          <th>Emissions (tons CO2e)</th>
+        </tr>
+        <tr>
+        </tr>
+      </table>
+      <h5 id="loading">Loading...</h5>
+    </div>
+  </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="drilldownModal" tabindex="-1" role="dialog" aria-labelledby="drilldownLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" id="drilldownLabel">Calculation drilldown</h4>
+      </div>
+      <div id="modalBody" class="modal-body">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

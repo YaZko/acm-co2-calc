@@ -1,0 +1,63 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
+  <title>Previous calculations</title>
+  <link rel="shortcut icon" href="favicon.ico">
+
+  <div id="app" class="flex flex-column"></div>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/feathers.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/global.css">
+</head>
+<body>
+  <script src="/js/results.js"></script>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">CO2 Footprint</a>
+      </div>
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li ><a href="/">Home</a></li>
+          <li class="active"><a href="#">My results <span class="sr-only">(current)</span></a></li>
+          <li><a href="/faq.html">FAQ</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#" onclick="logout()">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div id="main" class="container">
+    <div class="row">
+      <p class="lead">CSV Uploads</p>
+      <div class="results-inject">
+      </div>
+      <table id="myCSVS" class="table table-striped" style="display:none;">
+        <tr>
+          <th>#</th>
+          <th>Upload date</th>
+          <th>CSV Name</th>
+          <th>Passengers</th>
+          <th>Total CO2</th>
+          <th>Result CSV</th>
+        </tr>
+      </table>
+      <h5 id="loading">Loading...</h5>
+    </div>
+  </div>
+</body>
+</html>

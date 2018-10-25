@@ -1,0 +1,41 @@
+city1,city2,city3,isRoundtrip,shouldIncludeRadForcing
+college park md,sydney,,1,1
+fra,iad,,0,0
+baltimore md,beijing,,0,0
+dca,lax,fra,1,0
+london,moscow,,1,1
+warsaw,sydney,,5,
+fra,iad,,0,0
+baltimore md,beijing,,0,0
+dca,lax,fra,1,0
+london,moscow,,1,1
+college park md,sydney,,1,1
+fra,iad,,0,0
+baltimore md,beijing,,0,0
+dca,lax,fra,1,0
+london,moscow,,1,1
+warsaw,sydney,,1,1
+fra,iad,,0,0
+baltimore md,beijing,,0,0
+dca,lax,fra,1,0
+london,moscow,,1,1
+college park md,sydney,,1,1
+fra,iad,,0,0
+baltimore md,beijing,,0,0
+dca,lax,fra,1,0
+london,moscow,,1,1
+warsaw,sydney,,5,
+fra,iad,,0,0
+baltimore md,beijing,,0,0
+dca,lax,fra,1,0
+london,moscow,,1,1
+college park md,sydney,,1,1
+fra,iad,,0,0
+baltimore md,beijing,,0,0
+dca,lax,fra,1,0
+london,moscow,,1,1
+warsaw,sydney,,1,1
+fra,iad,,0,0
+baltimore md,beijing,,0,0
+dca,lax,fra,1,0
+london,moscow,,1,1

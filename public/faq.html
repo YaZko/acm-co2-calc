@@ -1,0 +1,144 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
+  <title>CO2 Footprint Calculation</title>
+  <link rel="shortcut icon" href="favicon.ico">
+
+  <div id="app" class="flex flex-column"></div>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/feathers.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/global.css">
+</head>
+<body>
+  <script type="text/javascript">
+    const socket = io();
+    const client = feathers()
+    .configure(feathers.hooks())
+    .configure(feathers.socketio(socket))
+    .configure(feathers.authentication({
+      cookie: 'feathers-jwt'
+    }));
+    function logout() {
+      // log out of feathers and redirect to login page
+      client.logout();
+      window.location.href = '/login.html';
+    };
+    client.authenticate()
+    .then(response => {
+      $("main").show();
+      client.set('jwt', response.accessToken)
+      return client.passport.verifyJWT(response.accessToken);
+    })
+    .then(user => {
+    })
+    .catch(error => {
+      console.log("auth error or not authenticated, redirecting...", error);
+      window.location.href = '/login.html';
+    });
+  </script>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">CO2 Footprint</a>
+      </div>
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><a href="/">Home </a></li>
+          <li><a href="/results.html">My results </a></li>
+          <li class="active"><a href="/faq.html">FAQ <span class="sr-only">(current)</span></a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#" onclick="logout()">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div id="main" class="container">
+    <div class="row">
+      <div class="col-md-8 col-md-offset-2">
+        <h1> About and FAQ </h1>
+        <hr />
+        <h4> What is the CO2 footprint calculation methodology?</h4>
+        <div class="well">
+          We use the methodology described
+          <a href="/methodology.pdf">in this document</a>, which distinguishes
+          short range (&lt;&nbsp;785km), medium range (&ge;&nbsp;785km and
+          &le;&nbsp;3,700km) and long range flights (&gt;&nbsp;3,700km).
+          The strategy and CO2 multiplication factors can be found
+          under the "Method 1" subheading.
+          <br/><br/>We use the same methodology as
+          <a href="http://carbonneutralcalculator.com/">carbonneutralcalculator.com</a>,
+          and our methodology document was retrieved from this site as well.
+          To calculate the distance between airports (and to find the closest airports to a city)
+          we use the <i>haversine</i> distance formula.
+          <br/><br/>
+          Finally, we assume all passengers fly economy, except for short distance flights,
+          for which only averaged data (among economy, business, and first class)
+          is available from our resource.
+        </div>
+        <h4> Other sites use different calculation methodologies, and sometimes come up with different results.
+          Why did you choose the the calculation method you did?</h4>
+        <div class="well">
+          Some  carbon calculators do not disclose their calculation formula
+          or give vague
+          descriptions of methodology. We settled on a popular, tested, and well-documented formula from
+          <a href="http://carbonneutralcalculator.com/">carbonneutralcalculator.com</a>.
+          Some sites also include <i>radiative forcing</i> but choose a
+          different forcing factor. We use the one
+          from <a href="http://www.carbonfootprint.com/calculator.aspx">carboonfootprint.com</a>,
+          described below.
+        </div>
+        <h4> What is radiative forcing? </h4>
+        <div class="well">
+          <a href="http://www.co2offsetresearch.org/aviation/RF.html">This resource </a>provides an
+          explaination of radiative forcing in the context of aircraft emissions.
+          We use the same methodology for radiative forcing as
+          <a href="http://www.carbonfootprint.com/calculator.aspx">carboonfootprint.com</a>,
+          and follow them in using the radiative forcing factor of 1.891 recommended by the UK Department for Environment, Food and Rural Affairs
+          (DEFRA).
+        </div>
+        <h4> What is CO2e? </h4>
+        <div class="well">
+          From the <a href="methodology.pdf">methodology text</a>,
+          "factors are provided in carbon dioxide equivalent (CO2e), and include
+          carbon dioxide (CO2), methane (CH4) and nitrous oxide (N2O), weighted
+          according to their global warming potentials (GWP)."
+        </div>
+        <h4> Why are you focusing on the air travel portion of conference CO2 emissions? </h4>
+        <div class="well">
+          According to <a href="http://www.pcmaconvene.org/features/cmp-series/meetings-and-climate-change/">
+            this analysis</a>, 70% of a typical conference’s CO2e is due to
+          air travel.
+          <!-- According to
+            <a href="https://terrapass.com">Terrapass.com</a>, traveling 40 miles, to and
+            from the airport or in a cab around town, will emit about 40 lbs of CO2;
+            each night spent in a hotel creates 75 lbs of CO2 from fossil fuel derived electricity.-->
+        </div>
+        <h4 id="context"> I would like some context for the reported numbers. What is the amount of CO2e
+          emitted by the average person, in various countries, over a year?
+          How much does a car emit per mile traveled? </h4>
+        <div class="well">
+          You can see the per capita emissions per country
+          <a href="https://en.wikipedia.org/wiki/List_of_countries_by_greenhouse_gas_emissions_per_capita">here</a>
+          (up through 2013). Additional data, including breakdown of emissions by different activities
+          (through 2015, in the USA), is
+          <a href="https://www.epa.gov/ghgemissions/global-greenhouse-gas-emissions-data">here<a>.
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

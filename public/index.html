@@ -1,0 +1,224 @@
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0" />
+  <title>CO2 Footprint Calculation</title>
+  <link rel="shortcut icon" href="favicon.ico">
+
+  <div id="app" class="flex flex-column"></div>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script src="/js/feathers.js"></script>
+  <script src="/js/toastr.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <link rel="stylesheet" href="/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/global.css">
+  <link rel="stylesheet" href="/css/toastr.min.css">
+</head>
+<body>
+  <script src="/js/common.js"></script>
+  <script src="/js/app.js"></script>
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/">CO2 Footprint</a>
+      </div>
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#">Home <span class="sr-only">(current)</span></a></li>
+          <li><a href="/results.html">My results </a></li>
+          <li><a href="/faq.html">FAQ </a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="#" onclick="logout()">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <div id="loading" class="container">
+    Loading...
+  </div>
+  <div id="main" class="container" style="display:none;">
+    <div class="row" style="padding-bottom:12px">
+      <div class="col-sm-10 col-sm-offset-1">
+        <p class="lead"> About</p>
+        <small>
+        This service, funded by the <a href="https://www.acm.org">Association of Computing Machinery’s</a> <a href="https://www.acm.org/special-interest-groups/volunteer-resources/sgb">Special Interest Group (SIG) Governing Board</a>, can be used to estimate the per-person CO2-equivalent emissions due to air travel and related activities involved with running conferences. It provides an interface for estimating CO2e for a single person’s trip, and an interference for estimating the CO2e for an entire conference. Results from past queries can be saved and retrieved for later examination.
+        </small>
+        <hr>
+
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-4 col-sm-offset-1">
+        <p class="lead">One itenerary</p>
+        <hr>
+        <form>
+          <div class="form-group">
+            <label for="inputCityA">Source City or Airport Code (IATA)</label>
+            <input type="text" class="form-control cityInput" id="inputCityA" placeholder="College Park, MD">
+          </div>
+          <p id="sourceCityOrIATA"></p>
+          <div id="sourceCityList" class="list-group">
+          </div>
+          <div class="form-group">
+            <label for="inputCityB">Destination City or Airport Code (IATA)</label>
+            <input type="text" class="form-control cityInput" id="inputCityB" placeholder="BWI">
+          </div>
+          <p id="destCityOrIATA"></p>
+          <div id="destCityList" class="list-group">
+          </div>
+          <div class="form-group">
+            <label>Select number of stops </label>
+            <select class="form-control" id="numStops">
+              <option value='0'>0</option>
+              <option value='1'>1</option>
+              <option value='2'>2</option>
+            </select>
+          </div>
+          <div id="hopsListPlaceholder">
+          </div>
+          <div class="form-group">
+            <div class="form-check">
+              <label for="isRoundtrip" class="form-check-label">
+                Round trip &nbsp;
+                <input class="form-check-input" id="isRoundtrip" type="checkbox" checked>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="form-check">
+              <label for="includeRadForcing" class="form-check-label">
+                Include Radiative Forcing
+                <a href="/faq.html">
+                  <span class="glyphicon glyphicon-question-sign"></span>
+                </a>
+                &nbsp;
+                <input class="form-check-input" id="includeRadForcing" type="checkbox" checked>
+              </label>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" id="submit">Calculate</button>
+        </form>
+        <hr>
+        <div id="co2-result" class="panel panel-info" style="cursor: pointer;" data-toggle="modal" data-target="#drilldownModal">
+          <div class="panel-heading">CO2 Footprint Result</div>
+          <ul class="list-group">
+            <li id="route-result" class="list-group-item"></li>
+            <li id="options-result" class="list-group-item">Roundrip | One-way With Rad forcing?</li>
+          </ul>
+          <div class="panel-footer info">
+            <p id="co2-result-val"> </p>
+            <p id="dist-warning" style="color:orange;"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6">
+        <p class="lead">Multiple iteneraries</p>
+        <hr>
+        <div class="panel panel-default">
+          <div class="panel-heading"><strong>Upload CSV</strong> Must be < 5 MB</div>
+          <div class="panel-body">
+            <h4>Select conference location (optional)</h4>
+            <div class="form-group">
+              <label for="conferenceLocation"><small>Conference City or IATA Code&nbsp;</small></label>
+              <input type="text" class="form-control cityInput" id="conferenceLocation" placeholder="New York, NY">
+            </div>
+            <div class="form-group" style="padding-top:5px;">
+              <label>
+                <input type="checkbox" id="radForcingCSV" checked> <small>Radiative Forcing</small> &nbsp;
+              </label>
+              <label>
+                <input type="checkbox" id="anonymizeOutput"> <small>Anonymize output</small>
+              </label>
+            </div>
+            <hr />
+            <h4>Select a CSV from your computer</h4>
+            <form action="" method="post" enctype="multipart/form-data" id="js-upload-form" accept=".csv">
+              <div class="form-inline">
+                <div class="form-group">
+                  <input type="file" name="files[]" id="js-upload-files">
+                </div>
+                <div class="form-group">
+                  <button type="submit" class="btn btn-sm btn-primary" id="js-upload-submit">Upload CSV</button>
+                </div>
+              </div>
+            </form>
+            <h4>Or drag and drop a CSV below</h4>
+            <div class="upload-drop-zone" id="drop-zone">
+              Just drag and drop a CSV here
+            </div>
+            <hr>
+            <form class="form-inline">
+              <div class="form-group">
+                <label>
+                  <small>Ignore distances under &nbsp;</small>
+                </label>
+                <div class="input-group col-sm-3">
+                  <input type="text" class="form-control input-sm" id="minDist" name="minDist" placeholder="0">
+                  <div class="input-group-addon">km</div>
+                </div>
+                <span class="small help-block" style="padding-top:5px">Iteneraries under this distance will not display the carbon footprint and will not count
+                  in the calculation of total distance or total emissions for this upload.</span>
+              </div>
+            </form>
+            <hr>
+            <strong>Instructions:</strong><br/>
+            <small>The comma separated values file (CSV) must have a properly formatted header delimiting the columns present in each row.</small><br/>
+            <small>Required columns:<em> city1 (minimally the start city)</small><br/>
+            <small>Optional columns:
+              <ul>
+                <li><em>city2:</em> optional stop, required if no conference location is specified</li>
+                <li><em>city3:</em> optional stop in a connecting flight</li>
+                <li><em>city4:</em> optional stop in a connecting flight</li>
+                <li><em>city5:</em> optional stop in a connecting flight</li>
+                <li><em>passengerName:</em> name of the passenger</li>
+                <li><em>isRoundTrip:</em> must be "true" (default) or "false". If there are passengers taking one way trips, add this column.</li>
+              </ul>
+            </small>
+            <small>To specify the conference location and/or minimum distance from within the
+              file, add a comment to the top of the CSV with the following format:
+              <ul>
+                <li># minDist=250 conferenceLocation="New York, NY"</li>
+              </ul>
+            </small>
+
+            <small>An example of a properly formatted CSV with one conference location selected is available <a href="/sampleConference.csv">here</a>
+              <br>
+              An example of of a CSV with varying start and end cities for each indivudal is available <a href="sampleUpload.csv">here</a>
+            </small>
+            <br/>
+          </div>
+        </div>
+      </div>
+    </div>
+<!-- Modal -->
+<div class="modal fade" id="drilldownModal" tabindex="-1" role="dialog" aria-labelledby="drilldownLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title" id="drilldownLabel">Calculation drilldown</h4>
+      </div>
+      <div id="modalBody" class="modal-body">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+  </body>
+  </html>
